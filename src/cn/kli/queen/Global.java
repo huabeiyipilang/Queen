@@ -144,8 +144,19 @@ public class Global {
 		return mDb.insert(DbHelper.TABLE_LOG, "", cv);
 	}
 	
+	public long addWish(String wish){
+		ContentValues cv = new ContentValues();
+		cv.put(DbHelper.WISH_CONTENT, wish);
+		cv.put(DbHelper.WISH_TIME, System.currentTimeMillis());
+		return mDb.insert(DbHelper.TABLE_WISH, "", cv);
+	}
+	
 	public Cursor getLotterHistory(){
 		return mHelper.getLottryHistoryCursor();
+	}
+	
+	public Cursor getWish(){
+		return mHelper.getWishCursor();
 	}
 	
 }

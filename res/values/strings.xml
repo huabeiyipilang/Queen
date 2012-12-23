@@ -40,5 +40,8 @@
   	<string name="commit">提交</string>
   	<string name="copy">复制</string>
   	<string name="copy_success">复制成功</string>
+  	
+  	<string name="enter_wish">许愿</string>
+  	<string name="wish_xinyuan">心愿</string>
 
 </resources>

@@ -3,8 +3,8 @@ package cn.kli.queen;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-
-import cn.kli.queen.R;
+import java.util.LinkedList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,9 +26,6 @@ import android.widget.Toast;
 
 public class Lottery extends Activity implements OnClickListener {
 	//views
-	private Button mChouJiang;
-	private Button mDuiJiang;
-	private Button mDianCan;
 	private TextView mTotalPrize;
 	private TextView mTodayChance;
 	private Global mGlobal;
@@ -48,16 +45,18 @@ public class Lottery extends Activity implements OnClickListener {
         Log.i("klilog","Lottery onCreate()");
         setContentView(R.layout.main);
     	
-        mDuiJiang = (Button)findViewById(R.id.duijiang);
-        mChouJiang = (Button)findViewById(R.id.choujiang);
-        mDianCan = (Button)findViewById(R.id.diancan);
         mTotalPrize = (TextView)findViewById(R.id.total_prize);
         mTodayChance = (TextView)findViewById(R.id.today_chance);
         mMainLayout = (LinearLayout)findViewById(R.id.main_layout);
-        mChouJiang.setOnClickListener(this);
-        mDuiJiang.setOnClickListener(this);
-        mDianCan.setOnClickListener(this);
         
+        List<View> enters = new LinkedList<View>();
+        enters.add(findViewById(R.id.choujiang));
+        enters.add(findViewById(R.id.choujiang));
+        enters.add(findViewById(R.id.diancan));
+        enters.add(findViewById(R.id.xuyuan));
+        for(View v:enters){
+        	v.setOnClickListener(this);
+        }
     }
     
     
@@ -102,8 +101,10 @@ public class Lottery extends Activity implements OnClickListener {
 			
 		case R.id.diancan:
 			gotoActivity(cn.kli.queen.diancan.SlideShowActivity.class);
-//			testForWX();
 //			gotoActivity(cn.kli.lottery.diancan.OrderForm.class);
+			break;
+		case R.id.xuyuan:
+			gotoActivity(cn.kli.queen.wish.Wish.class);
 			break;
 		}
 	}

@@ -49,7 +49,14 @@
             android:id="@+id/diancan"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/diancan" />
+            android:text="@string/diancan"
+            android:visibility="gone" />
+        
+        <Button 
+            android:id="@+id/xuyuan"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_wish"/>
     </LinearLayout>
 
 </LinearLayout>

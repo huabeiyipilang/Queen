@@ -32,7 +32,7 @@ public class LotteryHistory extends Activity {
 	
 	private class LotteryHistoryAdapter extends CursorAdapter{
 		LayoutInflater inflater;
-		SimpleDateFormat format = new SimpleDateFormat("yyyy��MM��dd�� HH:mm:ss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		public LotteryHistoryAdapter(Context context, Cursor c) {
 			super(context, c);
