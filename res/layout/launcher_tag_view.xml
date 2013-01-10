@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="#123456" >
+    android:background="#990099ff" >
 
     <ImageView
         android:id="@+id/tag_icon"

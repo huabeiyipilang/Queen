@@ -9,7 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        android:numColumns="3" >
+        android:horizontalSpacing="15dp"
+        android:verticalSpacing="15dp"
+        android:numColumns="2" >
     </GridView>
 
 </LinearLayout>
