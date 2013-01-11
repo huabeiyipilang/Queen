@@ -1,42 +1,58 @@
 package cn.kli.launcher;
 
+import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import cn.kli.queen.R;
+import android.util.DisplayMetrics;
 
-public abstract class TagView extends LinearLayout {
+
+public class TagView extends BaseTagView {
 	private Context mContext;
-	private ImageView mIcon;
-	private TextView mName;
+	private ResolveInfo mResolveInfo;
 
-	public TagView(Context context) {
+	public TagView(Context context, ResolveInfo info) {
 		super(context);
-		init(context);
-	}
-
-	private void init(Context context) {
 		mContext = context;
-		LayoutInflater inflater = LayoutInflater.from(mContext);
-		View root = inflater.inflate(R.layout.launcher_tag_view, this);
-		mName = (TextView)root.findViewById(R.id.tag_name);
-		mIcon = (ImageView)root.findViewById(R.id.tag_icon);
+		mResolveInfo = info;
+//		init();
+		bindApp(mResolveInfo);
 	}
 	
-	public void setTagName(String name){
-		mName.setText(name);
+	private void init(){
+		DisplayMetrics dm = new DisplayMetrics();   
+		((Activity)mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);  
+		int size = dm.widthPixels/3;
+		LayoutParams params = (LayoutParams) getLayoutParams();
+		if(params == null){
+			params = new LayoutParams(size, size);
+		}
+		this.setLayoutParams(params);
 	}
-	
-	public void setTagIcon(Drawable icon){
-		mIcon.setImageDrawable(icon);
-	}
-	
-	public abstract void onClick();
 
+	private void bindApp(ResolveInfo info){
+		PackageManager pm = mContext.getPackageManager();
+		String name = info.loadLabel(pm).toString();
+		setTagName(name);
+		Drawable icon = info.loadIcon(pm);
+		setTagIcon(icon);
+	}
+	
+	@Override
+	public void onClick(){
+		launchApp(mResolveInfo);
+	}
+	
+	private void launchApp(ResolveInfo reInfo){
+		String packageName = reInfo.activityInfo.packageName;
+		String name = reInfo.activityInfo.name;
+		ComponentName cn = new ComponentName(packageName,name);
+		Intent intent = new Intent();
+		intent.setComponent(cn);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		mContext.startActivity(intent);
+	}
 }

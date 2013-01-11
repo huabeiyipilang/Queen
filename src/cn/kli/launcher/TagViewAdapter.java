@@ -3,21 +3,33 @@ package cn.kli.launcher;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.kli.queen.QueenAppsManager;
+
+import android.content.Context;
+import android.content.pm.ResolveInfo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 public class TagViewAdapter extends BaseAdapter {
-	private List<TagView> mViewList = new ArrayList<TagView>();
+	private Context mContext;
+	private List<ResolveInfo> mAppList;
+
+	
+	public TagViewAdapter(Context context) {
+		super();
+		mContext = context;
+		mAppList = QueenAppsManager.getInstance(mContext).getQueenApps();
+	}
 
 	@Override
 	public int getCount() {
-		return mViewList.size();
+		return mAppList.size();
 	}
 
 	@Override
 	public Object getItem(int location) {
-		return mViewList.get(location);
+		return mAppList.get(location);
 	}
 
 	@Override
@@ -27,12 +39,7 @@ public class TagViewAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int location, View arg1, ViewGroup arg2) {
-		return mViewList.get(location);
-	}
-	
-	public void addTagView(TagView view){
-		mViewList.add(view);
-		notifyDataSetChanged();
+		return new TagView(mContext, mAppList.get(location));
 	}
 
 }

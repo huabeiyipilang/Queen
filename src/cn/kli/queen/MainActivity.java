@@ -1,17 +1,12 @@
 package cn.kli.queen;
 
-import java.util.List;
-
 import android.app.Activity;
-import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.util.DisplayMetrics;
 import android.view.Menu;
-import android.view.MotionEvent;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import cn.kli.launcher.TagGridView;
-import cn.kli.launcher.TagView;
 
 public class MainActivity extends Activity {
 	private final static int TAG_COUNT = 4;
@@ -26,14 +21,13 @@ public class MainActivity extends Activity {
 		mContainer = (LinearLayout)findViewById(R.id.container);
 		mGridView = new TagGridView(this);
 		mContainer.addView(mGridView);
-		initIcons();
 	}
 	
-	private void initIcons(){
-		List<ResolveInfo> appsList = QueenAppsManager.getInstance(this).getQueenApps();
-		for(ResolveInfo info : appsList){
-			mGridView.addTagView(new AppTagView(this, info));
-		}
+	private LayoutParams getTagViewParams(){
+		DisplayMetrics dm = new DisplayMetrics();   
+		getWindowManager().getDefaultDisplay().getMetrics(dm);  
+		int size = dm.widthPixels/3;
+		return new LayoutParams(size, size);
 	}
 	
 
