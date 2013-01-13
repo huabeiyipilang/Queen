@@ -13,7 +13,7 @@ public class AppTagView extends TagView {
 	private ResolveInfo mResolveInfo;
 
 	public AppTagView(Context context, ResolveInfo info) {
-		super(context);
+		super(context, info);
 		mContext = context;
 		mResolveInfo = info;
 		bindApp(mResolveInfo);
