@@ -23,10 +23,11 @@ public class UpdateInfoHelper {
 	private final static String VERSION_LIST_ELEMENT = "version_list";
 	private final static String VALUE_VERSION = "version";
 	
-	private final static String UPDATE_ELEMENT = "update";
-	private final static String VALUE_INDEX = "index";
-	private final static String VALUE_VERSION_FROM = "version_from";
-	private final static String VALUE_VERSION_TO = "version_to";
+	private final static String UPDATE_ELEMENT = "app";
+	private final static String VALUE_NAME = "name";
+	private final static String VALUE_PACKAGE = "package";
+	private final static String VALUE_VERSION_CODE = "version_code";
+	private final static String VALUE_VERSION_NAME = "version_name";
 	private final static String VALUE_DESCRIPTION = "description";
 	private final static String VALUE_URL = "url";
 	private final static String VALUE_SIZE = "size";
@@ -110,12 +111,14 @@ public class UpdateInfoHelper {
 			if (VALUE_VERSION.equals(tmp)) {
 				version = value;
 			} else if (info != null) {
-				if (VALUE_INDEX.equals(tmp)) {
-					info.index = value;
-				} else if (VALUE_VERSION_FROM.equals(tmp)) {
-					info.version_from = value;
-				} else if (VALUE_VERSION_TO.equals(tmp)) {
-					info.version_to = value;
+				if (VALUE_NAME.equals(tmp)) {
+					info.app_name = value;
+				} else if (VALUE_PACKAGE.equals(tmp)) {
+					info.pkg_name = value;
+				} else if (VALUE_VERSION_CODE.equals(tmp)) {
+					info.version_code = value;
+				} else if (VALUE_VERSION_NAME.equals(tmp)) {
+					info.version_name = value;
 				} else if (VALUE_DESCRIPTION.equals(tmp)) {
 					info.description = value;
 				} else if (VALUE_URL.equals(tmp)) {

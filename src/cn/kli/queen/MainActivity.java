@@ -22,6 +22,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		QueenAppsManager.removeChildrenIcon(this);
 		mContainer = (LinearLayout)findViewById(R.id.container);
 		mGridView = new TagGridView(this);
 		mContainer.addView(mGridView);

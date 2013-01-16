@@ -50,11 +50,13 @@ public class UpdateReceiver extends BroadcastReceiver {
 	}
 
 	private void showUpdateInstall(Context context, String file, UpdateInfo info) {
+		/*
 		Intent intent = new Intent(context, UpdateInstallActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.putExtra("update_file", file);
 		intent.putExtra("update_info", info);
 		context.startActivity(intent);
+		*/
 	}
 
     public static String cpFile() { // /sdcard0/update.zip to sdcard1/update.zip

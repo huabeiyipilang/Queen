@@ -13,6 +13,7 @@ public class QueenAppsManager {
 	
 	private static QueenAppsManager sInstance;
 	private Context mContext;
+	private final static String QUEEN_CHILD_ENTRY = "cn.kli.intent.ENABLE_ENTRY";
 	
 	private QueenAppsManager(Context context){
 		mContext = context;
@@ -28,8 +29,6 @@ public class QueenAppsManager {
 	public List<ResolveInfo> getQueenApps(){
 		PackageManager pm = mContext.getPackageManager();
 		Intent intent = new Intent("kli.intent.queen.tab", null);
-//        Intent intent = new Intent(Intent.ACTION_MAIN, null); 
-//        intent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> apps = pm.queryIntentActivities(intent, 0);
         List<ResolveInfo> queen_apps = new LinkedList<ResolveInfo>();
 		for (ResolveInfo app : apps) {
@@ -40,22 +39,11 @@ public class QueenAppsManager {
 		return queen_apps;
 	}
 	
-	public void removeChildrenIcon(){
-		PackageManager pm = mContext.getPackageManager();
-        Intent intent = new Intent(Intent.ACTION_MAIN, null); 
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        List<ResolveInfo> apps = pm.queryIntentActivities(intent, 0);
-		for (ResolveInfo app : apps) {
-			if(app.activityInfo.packageName.startsWith("cn.kli.queen.")){
-				String pkg = app.activityInfo.packageName;
-				String cls = app.activityInfo.name;
-				ComponentName cName = new ComponentName(pkg,cls);
-				int state = false ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-				 : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-				pm.setComponentEnabledSetting(cName,state, PackageManager.DONT_KILL_APP);
-			}
-		}
-		
+	public static void removeChildrenIcon(Context context){
+		Intent intent = new Intent();
+		intent.setAction(QUEEN_CHILD_ENTRY);
+		intent.putExtra("enable", false);
+		context.sendBroadcast(intent);
 	}
 	
 }

@@ -48,7 +48,7 @@ public class UpdateDownloadActivity extends Activity implements OnClickListener 
 	    klilog.i(mInfo.toString());
 	    setupMode(mode);
 	    StringBuilder sb = new StringBuilder();
-	    sb.append(getString(R.string.version)+mInfo.version_to);
+	    sb.append(getString(R.string.version)+mInfo.version_name);
 	    sb.append("\n");
 	    sb.append(getString(R.string.size, mInfo.size));
 	    sb.append("\n");

@@ -53,14 +53,6 @@ public class CheckUpdateActivity extends Activity implements OnClickListener, On
 				int res_update = mManager.checkUpdate();
 				onCheckFinished(res_update);
 				break;
-			case MSG_CHECK_ROLLBACK:
-				int res_rollback = mManager.checkRollback();
-				onCheckFinished(res_rollback);
-				break;
-			case MSG_GET_VERSION_LIST:
-				List<String> list = mManager.getVersionListBaseCurrent();
-				showVersionList(list);
-				break;
 			}
 		}
 	};

@@ -14,13 +14,7 @@ class UpdateUtils {
     /** the URL to check update
      * */
     static final String URL_PRODUCTS_UPDATE="http://bocaidong.sinaapp.com/tmp/update_products_list.xml";
-    static final String URL_TO_CHECK_UPDATE="http://bocaidong.sinaapp.com/tmp/update_list.xml";
-    static final String ro_build_id = "ro.build.id";
-    static final String ro_build_display_id = "ro.build.display.id";
-    static final String ro_build_date_utc = "ro.build.date.utc";
-    static final String ro_product_model = "ro.product.model";
-    static final String ro_product_device = "ro.product.device";
-    static final String ro_product_platform = "ro.product.platform";
+    static final String URL_TO_CHECK_UPDATE="http://bocaidong.sinaapp.com/kliapps/queen/queen_update_list.xml";
     
     private static final String PREFERENCE_NAME = "update_config";
     private static final String CONFIG_DOWNLOAD_ID = "download_id";

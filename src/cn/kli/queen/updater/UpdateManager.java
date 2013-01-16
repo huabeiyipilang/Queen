@@ -32,15 +32,6 @@ public class UpdateManager {
 	private static UpdateManager sInstance = null;
 	private Context mContext;
 	private List<UpdateInfo> mUpdateList;
-	private List<String> mVersionList;
-	private Comparator mComparator = new Comparator() {
-		@Override
-		public int compare(Object l, Object r) {
-			// if l > r , swap them
-			return mVersionList.indexOf(l) - mVersionList.indexOf(r);
-		}
-	};
-
     
 	private UpdateManager(Context context){
 		mContext = context;
@@ -61,7 +52,7 @@ public class UpdateManager {
 		if(mUpdateList == null){
 			return CHECK_FAILED;
 		}
-		List<String> list = getVersionListBaseCurrent();
+		List<String> list = null;
 		String version = getCurrentVersion();
 		int pos = list.indexOf(version);
 		if(pos < list.size() - 1){
@@ -71,62 +62,8 @@ public class UpdateManager {
 		}
 	}
 	
-	public int checkRollback(){
-		if(mUpdateList == null){
-			return CHECK_FAILED;
-		}
-		List<String> list = getVersionListBaseCurrent();
-		String version = getCurrentVersion();
-		int pos = list.indexOf(version);
-		if(pos > 0){
-			return CHECK_HAS_ROLLBACK;
-		}else{
-			return CHECK_NO_ROLLBACK;
-		}
-	}
-	
-	public List<String> getVersionListBaseCurrent(){
-		List<String> list = new ArrayList<String>();
-		String currentVersion = getCurrentVersion();
-		list.add(currentVersion);
-		for(UpdateInfo info:mUpdateList){
-			if(currentVersion.equals(info.version_from)){
-				list.add(info.version_to);
-			}
-			/*
-			if(currentVersion.equals(info.version_to)){
-				list.add(info.version_from);
-			}*/
-		}
-		Collections.sort(list, mComparator);
-		return list;
-	}
-	
-	public UpdateInfo getUpdateInfoTo(String version){
-		String currentVersion = getCurrentVersion();
-		UpdateInfo update_info = null;
-		for(UpdateInfo info:mUpdateList){
-			if(info.version_from.equals(currentVersion) &&
-					info.version_to.equals(version)){
-				update_info = info;
-				break;
-			}
-		}
-		return update_info;
-	}
-	
 	public String getCurrentVersion(){
 		return "2.1.1";
-	}
-	
-	private UpdateInfo getInfoByIndex(String index){
-		UpdateInfo update_info = null;
-		for(UpdateInfo info:mUpdateList){
-			if(info.index.equals(index)){
-				update_info = info;
-			}
-		}
-		return update_info;
 	}
 
 	private class SyncDataTask extends AsyncTask {
@@ -139,7 +76,7 @@ public class UpdateManager {
 		
 		@Override
 		protected Object doInBackground(Object... arg0) {
-			String url = getUpdateUrl();
+			String url = UpdateUtils.URL_TO_CHECK_UPDATE;
 			if(url == null){
 				return SYNC_FAIL;
 			}else if(url == ""){
@@ -156,36 +93,6 @@ public class UpdateManager {
 			callback.arg1 = (Integer) result;
 			callback.sendToTarget();
 		}
-
-		private String getUpdateUrl(){
-			String url = null;
-			HttpGet getMethod = new HttpGet(UpdateUtils.URL_PRODUCTS_UPDATE);
-			HttpClient httpClient = new DefaultHttpClient();
-			List<ProductInfo> productList = new ArrayList<ProductInfo>();
-			try {
-				HttpResponse response = httpClient.execute(getMethod);
-				String result = EntityUtils.toString(response.getEntity(),
-						UpdateUtils.ENCODE);
-				if (200 == response.getStatusLine().getStatusCode()) {
-					productList = ProductInfoHelper.getInstance().getProductList(result);
-					String this_model = android.os.Build.MODEL.toLowerCase(Locale.getDefault()).trim();
-					for(ProductInfo info : productList){
-						String model = info.model.toLowerCase(Locale.getDefault()).trim();
-						if(this_model.equals(model)){
-							url = info.url;
-							return url;
-						}
-					}
-					klilog.w("Products not in products list!");
-					return "";
-				}
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return null; 
-		}
 		
 		private int SyncData(String syncUrl) {
 			int res = SYNC_SUCCESS;
@@ -198,7 +105,6 @@ public class UpdateManager {
 				int code = response.getStatusLine().getStatusCode();
 				if (200 == code) { // get code of httpresponse
 					UpdateInfoHelper helper = new UpdateInfoHelper(result);
-					mVersionList = helper.getVersionList();
 					mUpdateList = helper.getUpdateList();
 				}else{
 					klilog.e("Http response error, code:" + code);
