@@ -48,22 +48,8 @@ public class UpdateManager {
 		new SyncDataTask(callback).execute("");
 	}
 	
-	public int checkUpdate(){
-		if(mUpdateList == null){
-			return CHECK_FAILED;
-		}
-		List<String> list = null;
-		String version = getCurrentVersion();
-		int pos = list.indexOf(version);
-		if(pos < list.size() - 1){
-			return CHECK_HAS_UPDATE;
-		}else{
-			return CHECK_NO_UPDATE;
-		}
-	}
-	
-	public String getCurrentVersion(){
-		return "2.1.1";
+	public List<UpdateInfo> getUpdateList(){
+		return mUpdateList;
 	}
 
 	private class SyncDataTask extends AsyncTask {
@@ -77,14 +63,7 @@ public class UpdateManager {
 		@Override
 		protected Object doInBackground(Object... arg0) {
 			String url = UpdateUtils.URL_TO_CHECK_UPDATE;
-			if(url == null){
-				return SYNC_FAIL;
-			}else if(url == ""){
-				mUpdateList = new ArrayList<UpdateInfo>();
-				return SYNC_SUCCESS;
-			}else{
-				return SyncData(url);
-			}
+			return SyncData(url);
 		}
 
 		@Override

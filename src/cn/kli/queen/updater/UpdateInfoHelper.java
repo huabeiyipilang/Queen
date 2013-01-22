@@ -18,10 +18,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class UpdateInfoHelper {
-	private final static String LIST_VERSION = "update_list_version";
-	
-	private final static String VERSION_LIST_ELEMENT = "version_list";
-	private final static String VALUE_VERSION = "version";
 	
 	private final static String UPDATE_ELEMENT = "app";
 	private final static String VALUE_NAME = "name";
@@ -36,7 +32,6 @@ public class UpdateInfoHelper {
 	private static MyLog klilog = new MyLog(UpdateInfoHelper.class);
 	
 	private List<UpdateInfo> mUpdateList;
-	private List<String> mVersionList;
 	public UpdateInfoHelper(String xml){
 		parse(xml);
 	}
@@ -48,11 +43,7 @@ public class UpdateInfoHelper {
 	public List<UpdateInfo> getUpdateList(){
 		return mUpdateList;
 	}
-	
-	public List<String> getVersionList(){
-		return mVersionList;
-	}
-	
+
 	private boolean parse(String xml){
 		ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes());
 		return parse(stream);
@@ -68,11 +59,6 @@ public class UpdateInfoHelper {
 			reader.setContentHandler(handler);
 			reader.parse(new InputSource(is));
 			mUpdateList = handler.update_list;
-			mVersionList = handler.version_list;
-			klilog.i("=========version list===========");
-			for(String ver : mVersionList){
-				klilog.i(ver);
-			}
 			for(UpdateInfo info:mUpdateList){
 				info.dump();
 			}
@@ -89,9 +75,7 @@ public class UpdateInfoHelper {
 	
 	private class XmlHandler extends DefaultHandler{
 		private List<UpdateInfo> update_list = new ArrayList<UpdateInfo>();
-		private List<String> version_list = new ArrayList<String>();
 		private UpdateInfo info;
-		private String version;
 		private String tmp;
 		
 		@Override
@@ -108,9 +92,7 @@ public class UpdateInfoHelper {
 		public void characters(char[] ch, int start, int length)
 				throws SAXException {
 			String value = new String(ch, start, length);
-			if (VALUE_VERSION.equals(tmp)) {
-				version = value;
-			} else if (info != null) {
+			if (info != null) {
 				if (VALUE_NAME.equals(tmp)) {
 					info.app_name = value;
 				} else if (VALUE_PACKAGE.equals(tmp)) {
@@ -137,8 +119,6 @@ public class UpdateInfoHelper {
 				throws SAXException {
 			if(UPDATE_ELEMENT.equals(localName)){
 				update_list.add(info);
-			}else if(VALUE_VERSION.equals(localName)){
-				version_list.add(version);
 			}
 			tmp = null;
 		}
