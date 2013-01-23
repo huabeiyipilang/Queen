@@ -1,26 +1,37 @@
 package cn.kli.queen.updater;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import cn.kli.queen.Klilog;
 import cn.kli.queen.R;
 
 public class AppListView extends LinearLayout {
+	private final static int INIT_LIST = 1;
 	private Context mContext;
 	
 	//views
@@ -29,6 +40,21 @@ public class AppListView extends LinearLayout {
 	//data
 	private AppAdapter mAdapter;
 	private List<UpdateAppInfo> mList;
+	
+	
+	private Handler mHandler = new Handler(){
+
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch(msg.what){
+			case INIT_LIST:
+				mAdapter = new AppAdapter(mList);
+				mListView.setAdapter(mAdapter);
+			}
+		}
+		
+	};
 	
 	public AppListView(Context context) {
 		super(context);
@@ -46,13 +72,57 @@ public class AppListView extends LinearLayout {
 		LayoutInflater inflater = LayoutInflater.from(mContext);
 		View root = inflater.inflate(R.layout.app_list_view, this);
 		mListView = (ListView)root.findViewById(R.id.update_app_list);
-		mList = getLocalAppInfo();
-		mAdapter = new AppAdapter(mList);
-		mListView.setAdapter(mAdapter);
+		TextView emptyView = new TextView(mContext);
+		emptyView.setText(R.string.loading);
+		mListView.setEmptyView(emptyView);
+		new AsyncTask(){
+
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				mList = getLocalAppInfo();
+				mHandler.sendEmptyMessage(INIT_LIST);
+				return null;
+			}
+			
+		}.execute("");
 	}
 
-	public void setRemoteList(List<UpdateInfo> list){
+	public void setRemoteList(final List<UpdateInfo> list, final Message callback){
+		new AsyncTask(){
+
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				mList = mergeRemoteList(list);
+				mHandler.sendEmptyMessage(INIT_LIST);
+				callback.sendToTarget();
+				return null;
+			}
+			
+		}.execute("");
+	}
+	
+	private List<UpdateAppInfo> mergeRemoteList(List<UpdateInfo> list) {
+		UpdateAppInfo tmp = null;
+		List<UpdateAppInfo> newApps = new ArrayList<UpdateAppInfo>();
+		List<UpdateAppInfo> res = getLocalAppInfo();
+		for(UpdateInfo remoteInfo : list) {
+			boolean hasLocal = false;
+			for(UpdateAppInfo localInfo : res) {
+				if (remoteInfo.pkg_name.equals(localInfo.pkgInfo.packageName)) {
+					localInfo.updateInfo = remoteInfo;
+					hasLocal = true;
+					break;
+				}
+			}
+			if(!hasLocal){
+				tmp = new UpdateAppInfo();
+				tmp.updateInfo = remoteInfo;
+				newApps.add(tmp);
+			}
+		}
 		
+		res.addAll(newApps);
+		return res;
 	}
 	
 	private List<UpdateAppInfo> getLocalAppInfo(){
@@ -61,7 +131,7 @@ public class AppListView extends LinearLayout {
 		List<UpdateAppInfo> local = new ArrayList<UpdateAppInfo>();
 		UpdateAppInfo tmp;
 		for(PackageInfo info : all){
-			if(info.packageName.startsWith("cn.kli.queen.")){
+			if(info.packageName.startsWith("cn.kli.queen")){
 				tmp = new UpdateAppInfo();
 				tmp.setPkgInfo(info);
 				local.add(tmp);
@@ -111,13 +181,19 @@ public class AppListView extends LinearLayout {
 			}else if(updateInfo != null){
 				
 			}
+			if(icon == null){
+				icon = mContext.getResources().getDrawable(android.R.drawable.sym_def_app_icon);
+			}
 			return icon;
 		}
 		
 		public String getName(){
+			PackageManager pm = mContext.getPackageManager();
 			String name = null;
 			if(pkgInfo != null){
-				name = pkgInfo.packageName;
+				name = (String) pm.getApplicationLabel(pkgInfo.applicationInfo);
+			}else{
+				name = updateInfo.app_name;
 			}
 			return name;
 		}
@@ -162,16 +238,16 @@ public class AppListView extends LinearLayout {
 		private ImageView icon;
 		private TextView name;
 		private TextView version;
-		private ImageButton button;
+		private Button button;
 		
-		public AppUpdateView(Context context, UpdateAppInfo info) {
+		public AppUpdateView(Context context, final UpdateAppInfo info) {
 			super(context);
 			inflater = LayoutInflater.from(context);
 			View root = inflater.inflate(R.layout.app_list_item, this);
 			icon = (ImageView)root.findViewById(R.id.app_icon);
 			name = (TextView)root.findViewById(R.id.app_name);
 			version = (TextView)root.findViewById(R.id.app_current_version);
-			button = (ImageButton)root.findViewById(R.id.app_upload);
+			button = (Button)root.findViewById(R.id.app_upload);
 
 			try {
 				icon.setImageDrawable(info.getIcon());
@@ -180,7 +256,62 @@ public class AppListView extends LinearLayout {
 			}
 			name.setText(info.getName());
 			version.setText(info.getCurrentVersion());
+			
+			switch(info.getUpdateType()){
+			case UpdateAppInfo.TYPE_NEW:
+				button.setEnabled(true);
+				button.setText(R.string.install);
+				button.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View arg0) {
+						download(info);
+					}
+					
+				});
+				break;
+			case UpdateAppInfo.TYPE_NO:
+				button.setText(R.string.update);
+				button.setEnabled(false);
+				break;
+			case UpdateAppInfo.TYPE_UNINSTALL:
+				button.setText(R.string.update);
+				button.setEnabled(false);
+				break;
+			case UpdateAppInfo.TYPE_UPDATE:
+				button.setText(R.string.update);
+				button.setEnabled(true);
+				button.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View arg0) {
+						download(info);
+					}
+					
+				});
+				break;
+			}
 		}
 		
 	}
+	
+	private void download(UpdateAppInfo info){
+        DownloadManager dm=((DownloadManager)mContext.getSystemService("download"));
+        String url = info.updateInfo.url;
+        Uri uri = Uri.parse(url);
+        Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS).mkdirs();
+        Request dwreq = new DownloadManager.Request(uri);
+        dwreq.setTitle(mContext.getString(R.string.download_title, info.updateInfo.app_name));
+
+        String filename = url.substring(url.lastIndexOf("/") + 1);
+        Klilog.i("download  file name = "+filename);
+        dwreq.setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                filename);
+//        dwreq.setNotificationVisibility(Request.VISIBILITY_VISIBLE);
+        
+        long id = dm.enqueue(dwreq);
+        UpdateUtils.putDownloadInfo(mContext, id);
+    }
 }

@@ -1,11 +1,10 @@
 package cn.kli.queen.updater;
 
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
@@ -14,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.Toast;
 
 public class UpdateReceiver extends BroadcastReceiver {
 	MyLog klilog = new MyLog(UpdateReceiver.class);
@@ -38,59 +38,111 @@ public class UpdateReceiver extends BroadcastReceiver {
 				int columnIndex = c
 						.getColumnIndex(DownloadManager.COLUMN_STATUS);
 				if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
-				    cpFile();//:TODO cp file from /flash to /sdcard
 					String update_uri = c.getString(c
 									.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI));
-					showUpdateInstall(context, update_uri, UpdateUtils.getUpdateInfoCache(context));
+//					new InstallThread(context, update_uri).start();
+					autoInstall(update_uri);
 					//wipe cache
-					UpdateUtils.putDownloadInfo(context, 0, null);
+					UpdateUtils.putDownloadInfo(context, 0);
 				}
 			}
 		}
 	}
+	
+	private void autoInstall(final String uri){
+		new Thread(){
 
-	private void showUpdateInstall(Context context, String file, UpdateInfo info) {
-		/*
-		Intent intent = new Intent(context, UpdateInstallActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.putExtra("update_file", file);
-		intent.putExtra("update_info", info);
-		context.startActivity(intent);
-		*/
+			@Override
+			public void run() {
+				super.run();
+				String path = uri.substring(uri.indexOf("/mnt"));
+				klilog.i("install start file = "+path);
+				long start = System.currentTimeMillis();
+				rootCommand("pm install -r "+ path + "\n");
+				klilog.i("install success use time:"+(System.currentTimeMillis() - start));
+			}
+			
+		}.start();
 	}
+	
+	private boolean rootCommand(String command) {
+		Process process = null;
+		DataOutputStream os = null;
+		try {
+			process = Runtime.getRuntime().exec("su");
+			os = new DataOutputStream(process.getOutputStream());
+			os.writeBytes(command + "\n");
+			os.writeBytes("exit\n");
+			os.flush();
+			process.waitFor();
+		} catch (Exception e) {
+			Log.d("*** DEBUG ***", "ROOT REE" + e.getMessage());
+			return false;
+		} finally {
+			try {
+				if (os != null) {
+					os.close();
+				}
+				process.destroy();
+			} catch (Exception e) {
+				// nothing
+			}
+		}
 
-    public static String cpFile() { // /sdcard0/update.zip to sdcard1/update.zip
-        try {
-            File oldfile = new File("/flash/update.zip");
-            File newfile = new File("/sdcard/update.zip");
-            if (newfile.exists())
-                newfile.delete();
-            FileInputStream in = new FileInputStream(oldfile);
-            FileOutputStream out = new FileOutputStream(newfile);
-            FileChannel inc=in.getChannel();
-            FileChannel outc = out.getChannel();
-            int len =2097152;
-            ByteBuffer b=null;
-            while (true) {
-                if (inc.position() == inc.size()) {
-                    in.close();
-                    out.close();
-                    return "OK";
-                }
-                if(inc.size()-inc.position() < len){
-                    len = (int)(inc.size()-inc.position());
-                }else{
-                    len =2097152;
-                }
-                b = ByteBuffer.allocateDirect(len);
-                inc.read(b); b.flip();
-                outc.write(b);
-                outc.force(false);
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-           return e.toString()+ " " ;
-        }
-        //return "OK";
-    }
+		Log.d("*** DEBUG ***", "Root SUC ");
+		return true;
+	}
+	
+	private class InstallThread extends Thread { 
+		private String mPath;
+		private Context mContext;
+
+		public InstallThread(Context context, String path){
+			mPath = path;
+			mContext = context;
+		}
+
+		public void run() { 
+			Process process = null; 
+			OutputStream out = null; 
+			InputStream in = null; 
+			try { 
+				klilog.i("install start file = "+mPath);
+				long start = System.currentTimeMillis();
+				// 请求root 
+				process = Runtime.getRuntime().exec("su");  
+				out = process.getOutputStream(); 
+				// 调用安装 
+				out.write(("pm install -r " + mPath + "\n").getBytes()); 
+				/*
+				in = process.getInputStream(); 
+				int len = 0; 
+				byte[] bs = new byte[256]; 
+				while (-1 != (len = in.read(bs))) { 
+					String state = new String(bs, 0, len); 
+					if (state.equals("Success\n")) {
+						Toast.makeText(mContext, "Install success!", Toast.LENGTH_LONG).show();
+						klilog.i("install success use time:"+(System.currentTimeMillis() - start));
+					} else{
+						klilog.i("install failed use time:"+(System.currentTimeMillis() - start));
+					}
+				} */
+			} catch (Exception e) { 
+				Toast.makeText(mContext, "Install failed!", Toast.LENGTH_LONG).show();
+				e.printStackTrace(); 
+			} finally { 
+				try { 
+					if (out != null) { 
+						out.flush(); 
+						out.close(); 
+					} 
+					if (in != null) { 
+						in.close(); 
+					} 
+				} catch (IOException e) { 
+					e.printStackTrace(); 
+				} 
+			} 
+		} 
+	}
 }

@@ -12,48 +12,16 @@
 	<string name="later">稍后安装</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
-	<string name="install">立即安装</string>
 	<string name="abandon">放弃</string>
 	<string name="sync_failed">同步失败！</string>
-	<string name="already_latest_version">已经是最新版本！</string>
-	<string name="no_rollback_version">没有可回退的版本！</string>
 	<string name="checking">正在检查</string>
-	<string name="version_back">版本回退</string>
+	<string name="loading">加载中...</string>
 	
-	<string name="product">型号：</string>
-	<string name="android_version">Android 版本：</string>
-	<string name="system_version">系统版本：</string>
-	<string name="update_to_version">更新到版本：%s</string>
-	<string name="rollback_to_version">回退到版本：%s</string>
-	<string name="current_version_ps">（当前版本）</string>
-	<string name="please_choose_version">请选择版本</string>
+	<!-- buttons -->
+	<string name="update">升级</string>
+	<string name="install">安装</string>
+	<string name="uninstall">卸载</string>
 	
-	<!-- update download -->
-	<string name="download_any_data">通过任何可用的数据连接进行下载</string>
-	<string name="download_only_wifi">仅通过WLAN下载</string>
-	<string name="version">版本:</string>
-	<string name="size">大小:%s bytes</string>
-	<string name="description">说明:</string>
-	<string name="network_not_avaliable">网络不可用！</string>
-    <string name="current_version">当前版本:</string>
-    <string name="latest_version">最新版本:</string>
-    <string name="firstly"> 一 .</string>
-    <string name="check_update">检查更新</string>
-    <string name="secondly"> 二 .</string>
-    <string name="download">下载更新</string>
-    <string name="thirdly"> 三 .</string>
-    <string name="run_update">执行更新</string>
-    <string name="not_need_update">你的版本已是最新,不需要更新</string>
-    <string name="download_over_toast"> 下载完成,重启后更新(TODO) </string>
-    <string name="checking_update">正在检查更新 . . .</string>
-    <string name="download_title">下载升级文件</string>
-    <string name="download_description">下载升级所需要的更新文件</string>
+	<string name="download_title">正在下载：%s</string>
 	
-	<!-- update install -->
-	<string name="install_alerting">升级过程中您无法使用电话，也不能拨打紧急电话。在升级过程中请勿关闭电话，或者取出电池或存储卡。</string>
-    <string name="install_notices">更新前请备份数据(如，联系人，信息，通话记录等),并保证有足够的电量</string>	
-    <string name ="update_later_msg">点击进入系统更新</string>
-    <string name ="exit_title">稍后更新</string>
-    <string name ="exit_message">您可以随时从通知栏进入更新</string>
-    <string name ="check_file_failed">文件校验失败，请重新下载</string>
 </resources>

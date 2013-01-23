@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 import cn.kli.queen.R;
@@ -14,7 +15,9 @@ public class CheckUpdateActivity extends Activity implements OnClickListener{
 	private final static int MSG_SYNC_START = 1;
 	private final static int MSG_SYNC_FINISHED = 2;
 	private final static int MSG_CHECK_UPDATE = 3;
+	private final static int MSG_CHECK_FINISHED = 4;
 
+	private MyLog klilog = new MyLog(this.getClass());
 	//views
 	private AppListView mAppList;
 	
@@ -34,11 +37,13 @@ public class CheckUpdateActivity extends Activity implements OnClickListener{
 				mManager.sync(sync_msg);
 				break;
 			case MSG_SYNC_FINISHED:
-				hideCheckingDialog();
 				onSyncFinished(msg);
 				break;
 			case MSG_CHECK_UPDATE:
-				mAppList.setRemoteList(mManager.getUpdateList());
+				mAppList.setRemoteList(mManager.getUpdateList(), obtainMessage(MSG_CHECK_FINISHED));
+				break;
+			case MSG_CHECK_FINISHED:
+				hideCheckingDialog();
 				break;
 			}
 		}
@@ -61,13 +66,13 @@ public class CheckUpdateActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		long start = System.currentTimeMillis();
 		setContentView(R.layout.activity_update_check);
 		mManager = UpdateManager.getInstance(this);
 		findViewById(R.id.check_update).setOnClickListener(this);
 		mAppList = (AppListView)findViewById(R.id.app_list_view);
 	}
 
-	
 	private void onSyncFinished(Message msg){
 		switch (msg.arg1) {
 		case UpdateManager.SYNC_SUCCESS:

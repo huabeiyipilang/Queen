@@ -28,6 +28,13 @@ class UpdateUtils {
     	editor.commit();
     }
     
+    public static void putDownloadInfo(Context context, long id){
+    	SharedPreferences pref= context.getSharedPreferences(PREFERENCE_NAME,0);
+    	SharedPreferences.Editor editor = pref.edit();
+    	editor.putLong(CONFIG_DOWNLOAD_ID, id);
+    	editor.commit();
+    }
+    
     public static long getDownloadId(Context context){
     	SharedPreferences pref= context.getSharedPreferences(PREFERENCE_NAME,0);
     	return pref.getLong(CONFIG_DOWNLOAD_ID, 0);
