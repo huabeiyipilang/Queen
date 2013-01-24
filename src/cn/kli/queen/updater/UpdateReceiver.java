@@ -1,7 +1,6 @@
 package cn.kli.queen.updater;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -40,13 +40,20 @@ public class UpdateReceiver extends BroadcastReceiver {
 				if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
 					String update_uri = c.getString(c
 									.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI));
-//					new InstallThread(context, update_uri).start();
-					autoInstall(update_uri);
+//					autoInstall(update_uri);
+					install(context, update_uri);
 					//wipe cache
 					UpdateUtils.putDownloadInfo(context, 0);
 				}
 			}
 		}
+	}
+	
+	private void install(Context context, final String uri){
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setDataAndType(Uri.parse(uri),"application/vnd.android.package-archive");
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
 	}
 	
 	private void autoInstall(final String uri){

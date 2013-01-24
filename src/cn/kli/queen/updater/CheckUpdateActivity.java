@@ -66,11 +66,11 @@ public class CheckUpdateActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		long start = System.currentTimeMillis();
 		setContentView(R.layout.activity_update_check);
 		mManager = UpdateManager.getInstance(this);
 		findViewById(R.id.check_update).setOnClickListener(this);
 		mAppList = (AppListView)findViewById(R.id.app_list_view);
+		Toast.makeText(this, R.string.loading_local_module, Toast.LENGTH_SHORT).show();
 	}
 
 	private void onSyncFinished(Message msg){

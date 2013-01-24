@@ -15,7 +15,7 @@
 	<string name="abandon">放弃</string>
 	<string name="sync_failed">同步失败！</string>
 	<string name="checking">正在检查</string>
-	<string name="loading">加载中...</string>
+	<string name="loading_local_module">正在加载本地组件</string>
 	
 	<!-- buttons -->
 	<string name="update">升级</string>

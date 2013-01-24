@@ -72,9 +72,6 @@ public class AppListView extends LinearLayout {
 		LayoutInflater inflater = LayoutInflater.from(mContext);
 		View root = inflater.inflate(R.layout.app_list_view, this);
 		mListView = (ListView)root.findViewById(R.id.update_app_list);
-		TextView emptyView = new TextView(mContext);
-		emptyView.setText(R.string.loading);
-		mListView.setEmptyView(emptyView);
 		new AsyncTask(){
 
 			@Override

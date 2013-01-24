@@ -7,6 +7,7 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import cn.kli.launcher.TagGridView;
@@ -29,28 +30,15 @@ public class MainActivity extends Activity implements OnClickListener{
 		findViewById(R.id.updater).setOnClickListener(this);
 	}
 	
-	private LayoutParams getTagViewParams(){
-		DisplayMetrics dm = new DisplayMetrics();   
-		getWindowManager().getDefaultDisplay().getMetrics(dm);  
-		int size = dm.widthPixels/3;
-		return new LayoutParams(size, size);
-	}
-	
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		
-	}
-
-
+	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-
+	*/
+	
 	@Override
 	public void onClick(View view) {
 		switch(view.getId()){
